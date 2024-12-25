@@ -21,7 +21,7 @@ loginRouter.post('/',async(request,response)=>{
     }
 
     //digitally signed jwt token
-    const token=jwt.sign(userToken,process.env.SECRET,{expiresIn:60*30})
+    const token=jwt.sign(userToken,process.env.SECRET,{expiresIn:60*20})
 
     //user forced to re-login after 30 minutes
     response.status(200).send({token,username:user.username,name:user.name})

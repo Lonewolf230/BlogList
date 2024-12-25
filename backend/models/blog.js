@@ -14,8 +14,13 @@ const blogSchema=new mongoose.Schema({
     type:Number,
     default:0
   },
+  liked:{
+    type:Boolean,
+    default:false
+  },
   content:{
     type:String,
+    
   },
   user:{
     type:mongoose.Schema.Types.ObjectId, //Referencing Users in blogs collection

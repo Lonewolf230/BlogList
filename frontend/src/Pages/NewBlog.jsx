@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { useContext, useState } from "react"
 import AuthContext from "../Auth/AuthProvider"
+import axios from 'axios'
 
 
 export default function NewBlog(){
@@ -12,9 +13,21 @@ export default function NewBlog(){
     const handleSubmit =async (e)=>{
 
         e.preventDefault()
-        
+        const token=localStorage.getItem('token')
+        const bearerToken=`Bearer ${token}`
+        try{
+            await axios.post('/api/blogs',blogData,{
+                headers:{
+                    'Authorization':bearerToken
+                }
+            })
+            navigate('../main')
+        }
+        catch(err){
 
-        navigate('../blogs')
+        }
+
+        
     }
 
     const handleChange=(e)=>{
@@ -56,7 +69,7 @@ export default function NewBlog(){
                 <>
                     <div className="flex flex-col items-center justify-center  min-h-screen ">
                         <h1 className="text-blue-600 text-4xl font-black mb-6">Please Log In to your Account to continue writing your blogs</h1>
-                        <NavLink  to='../login' className="hover:underline hover:cursor-pointer text-2xl">Log In</NavLink>
+                        <NavLink  to='../../' className="hover:underline hover:cursor-pointer text-2xl">Log In</NavLink>
                     </div>
                 </>
             )
@@ -71,24 +84,3 @@ export default function NewBlog(){
 }
 
 
-// export async function action({request}){
-//     const formData=await request.formData()
-    
-//     const blog={
-//             title:formData.get('title'),
-//             author:formData.get('author'),
-//             //content:formData.get('content')
-//         }
-//     try{
-//         //await axios.post('http://localhost:4001/api/blogs',blog)
-//         const response=redirect('../blogs')
-//         response.body=true
-//         return response
-//     }
-    
-//     catch(error){
-//         return {error:error.message}
-//     }
-
-
-// }

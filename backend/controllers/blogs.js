@@ -9,66 +9,95 @@ require('dotenv').config()
 
 
 
-blogRouter.get('/',async (request, response,next) =>{
-      const query=request.query
+blogRouter.get('/',middleware.decodeandVerifyToken,async (request, response,next) =>{
+    const query=request.query
+    const decodedToken=request.decodedToken
     try{
       console.log(query)
       let blogs
-      if(query.public==='true')
-        blogs=await Blog.find({public:true}).populate('user',{username:1,name:1})
-      else
-        blogs=await Blog.find({}).populate('user',{username:1,name:1})
-        
-      response.json(blogs)
+      if(decodedToken.id){
+        if(query.public==='true')
+          blogs=await Blog.find({public:true}).populate('user',{username:1,name:1})
+        else
+          blogs=await Blog.find({}).populate('user',{username:1,name:1})
+          
+        response.json(blogs)
+      }
     }
     catch(error){
       next(error)
     }
   })
-  
 
-
-blogRouter.get('/:username',middleware.decodeandVerifyToken,async(request,response,next)=>{
-  
-  const query=request.query
-  
-  try{
-    
-    // let decodedToken;
-    //     try {
-    //         decodedToken = middleware.decodeandVerifyToken(request);
-    //     } catch (err) {
-    //         if (err.name !== 'JsonWebTokenError' && err.name !== 'TokenExpiredError') {
-    //             return next(err);
-    //         }
-    //     }
-    //const decodedToken=middleware.decodeandVerifyToken(request)
-    const user=await User.findOne({username:request.params.username})
-    if(!user)
-      return response.status(404).json({error:"User Not found"})
-    if(request.decodedToken.id.toString() !== user._id.toString()){
-      return response.status(403).json({error:"You are not authorised to access this page"})
+  blogRouter.get('/:id',middleware.decodeandVerifyToken,async (request,response,next)=>{
+    const decodedToken=request.decodedToken
+    console.log(decodedToken)
+    try{
+      if(decodedToken.id){
+        const blog=await Blog.findById(request.params.id).populate('user',{username:1,name:1})
+        if(blog)
+          response.json(blog)
+        else
+          response.status(404).send("Blog not found")
+      }
     }
-    let blogs
-    if(query.public==='true')
-      blogs=await Blog.find({user:user._id,public:true}).populate('user',{username:1})
-    else
-      blogs=await Blog.find({user:user._id}).populate('user',{username:1})
+    catch(err){
+      next(err)
+    }
+  })
+  
 
-    response.json(blogs)
-  }
-  catch(err){
-    next(err)
-  }
+
+// blogRouter.get('user/:username',middleware.decodeandVerifyToken,async(request,response,next)=>{
+  
+//   const query=request.query
+//   const decodedToken=request.decodedToken
+//   try{
+    
+//     if(decodedToken.id){
+//       const user=await User.find({username:decodedToken.username})
+//       console.log(user);
+//       if(!user)
+//         return response.status(404).json({error:"User Not found"})
+//       if(request.decodedToken.id.toString() !== user._id.toString()){
+//         return response.status(403).json({error:"You are not authorised to access this page"})
+//       }
+//       let blogs
+    
+//       blogs= await Blog.find({user:user._id}).populate('user',{username:1,name:1})
+//       response.json(blogs)
+//     }
+//   }
+//   catch(err){
+//     next(err)
+//   }
+// })
+
+blogRouter.get('/user/:username',middleware.decodeandVerifyToken,async(request,response,next)=>{
+    const decodedToken=request.decodedToken
+    console.log(decodedToken);
+    try{
+      if(decodedToken.username){
+        const user=await User.findOne({username:decodedToken.username})
+        console.log(user)
+        if(!user)
+          return response.status(404).json({error:"User Not found"})
+        if(decodedToken.id.toString() !== user._id.toString())
+          return response.status(403).json({error:"You are not authorised to access this page"})
+        const blogs=await Blog.find({user:user._id}).populate('user',{username:1,name:1})
+        console.log(blogs)
+        response.status(200).json(blogs)
+      }
+    }
+    catch(err){
+      console.log(err);
+      next(err)
+    }
 })
 
 blogRouter.post('/',middleware.decodeandVerifyToken,async (request, response,next) => {
   try{
     const body=request.body
-
-    //adding a new blog only if user has a valid token(post request)
-
-    //const decodedToken= middleware.decodeandVerifyToken(request)
     const decodedToken=request.decodedToken
     const user=await User.findById(decodedToken.id)
 
@@ -78,8 +107,8 @@ blogRouter.post('/',middleware.decodeandVerifyToken,async (request, response,nex
       likes:body.likes,
       user:user._id,
       public:body.public,
+      content:body.content
     })
-
     
       const blog_added=await blog.save()
 
@@ -119,18 +148,28 @@ blogRouter.delete('/:id',middleware.decodeandVerifyToken,async (request,response
   
   })
 
-blogRouter.put('/:id',async (request,response)=>{
+blogRouter.put('/:id',middleware.decodeandVerifyToken,async (request,response)=>{
   //creating a new Model instance doesnt work as it will have a different _id 
   const id=request.params.id
-  const blog={
-    title:request.body.title,
-    author:request.body.author,
-    likes:request.body.likes,
-    public:request.body.public,
+  const decodedToken=request.decodedToken
+  try{
+    if(decodedToken.id){
+      const blog={
+        title:request.body.title,
+        author:request.body.author,
+        likes:request.body.likes,
+        public:request.body.public,
+        liked:request.body.liked,
+        content:request.body.content
+      }
+    
+      const updated_obj=await Blog.findByIdAndUpdate({_id:id},blog,{new:true})
+      response.json(updated_obj)
+    }
   }
-
-  const updated_obj=await Blog.findByIdAndUpdate({_id:id},blog,{new:true})
-  response.json(updated_obj)
+  catch(err){
+    console.log(err);
+  }
 })
 
 

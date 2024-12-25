@@ -19,11 +19,11 @@ export default function NavBar(){
             <header className="bg-white text-blue-600 text-2xl shadow-md h-20 p-2">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="text-2xl font-bold">
-                        <NavLink to="/">HOME</NavLink>
+                        <NavLink to="/main">HOME</NavLink>
                     </div>
                     <nav className="flex space-x-4 gap-6">
                         <NavLink to='blogs'>My Blogs</NavLink>
-                        {!loggedIn?<NavLink to='../login'>Login</NavLink>:<button onClick={logOut}>Logout</button>}
+                        
                         <NavLink to='profile'><img width="36" height="50" className="pb-2" src="https://img.icons8.com/ios-filled/50/2563eb/test-account.png" alt="test-account"/></NavLink>
                     </nav>
                 </div>

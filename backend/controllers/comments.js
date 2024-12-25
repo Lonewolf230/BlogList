@@ -16,9 +16,9 @@ commentRouter.get('/:id',async(request,response,next)=>{
     }
 })
 
-commentRouter.post('/:id',async(request,response,next)=>{
+commentRouter.post('/:id',middleware.decodeandVerifyToken,async(request,response,next)=>{
     try{
-        const decodedToken=middleware.decodeandVerifyToken(request,response)
+        const decodedToken=request.decodedToken
         
         const comment=new Comment({
             comment:request.body.comment,

@@ -11,6 +11,7 @@ import MyBlogs from './Pages/MyBlogs'
 import SignUp from './Pages/SignUp'
 import { AuthProvider } from './Auth/AuthProvider'
 import Blog from './Pages/Blog'
+import ProfileOther from './Pages/ProfileOther'
 
 function App() {
   const routerobj=createBrowserRouter(createRoutesFromElements(
@@ -22,6 +23,7 @@ function App() {
           <Route path='profile' element={<Profile />}/>
           <Route path='newblog' element={<NewBlog/>} />
           <Route path='blogs' element={<MyBlogs/>}/>
+          <Route path=':id/profile' element={<ProfileOther/>} />
         </Route>
       <Route path='/login' element={<Login/>} />
       <Route path='/signup' element={<SignUp/>}/>

@@ -24,6 +24,14 @@ const userSchema=mongoose.Schema({
     comments:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Comment"
+    }],
+    followers:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+    }],
+    following:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
     }]  
 })
 

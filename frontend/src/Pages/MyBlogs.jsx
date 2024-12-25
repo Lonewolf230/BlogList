@@ -1,6 +1,8 @@
-import { useContext, useState } from "react"
+import axios from 'axios'
+import { useContext, useEffect, useState } from "react"
 import AuthContext from "../Auth/AuthProvider"
 import { NavLink,useLocation,Link } from "react-router-dom"
+import { jwtDecode } from 'jwt-decode'
 
 export default function MyBlogs(){
 
@@ -64,25 +66,43 @@ export default function MyBlogs(){
         createdAt:"12:02:56 am",
         id:"8754"
     }]
-
-    const [like,setLike]=useState(false)
-    const toggleLike=()=>{
-
+    const [blogs,setBlogs]=useState([])
+    const username=jwtDecode(localStorage.getItem('token')).username
+    console.log(username)
+    
+    const getBlogs=async()=>{
+        const result=await axios.get(`/api/blogs/user/${username}`,{
+            headers:{
+                'Authorization':`Bearer ${localStorage.getItem('token')}`
+            }
+        })
+        console.log(result);
+        return result.data
     }
+    useEffect(()=>{
+        try{
+            const fetchBlogs=async()=>{
+                const blogs=await getBlogs()
+                setBlogs(blogs)
+            }
+            fetchBlogs()
+        }
+        catch(err){
+            console.log(err);
+        }
+    },[])
+    console.log(blogs);
 
     return(
         
         <>
             {loggedIn? (
-                myBlogs.map(blog=>(
+                blogs.map(blog=>(
                 <>
                 <div className="flex flex-col p-12 justify-center bg-slate-200 my-9 mx-24 rounded-xl poppins-regular" key={blog.id}>
                     <h1 className="text-blue-500 font-black text-center text-2xl">{blog.title}</h1>
                     <h4 className="text-right mr-5">-By {blog.author}</h4>
                     <p className="my-10">{blog.content}</p>
-                    <div className="flex gap-12">
-                        <button onClick={toggleLike}><span className="material-symbols-outlined border-none">favorite</span><span>{like.count}</span></button>
-                    </div>
                     
                 </div>
                 </>

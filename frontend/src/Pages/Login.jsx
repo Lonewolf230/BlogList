@@ -24,7 +24,7 @@ export default function Login(){
            const response=await axios.post(baseUrl,login)
            const token=response.data.token
            logIn(token)
-           await navigate('/main')
+           navigate('/main')
         }
         catch(err){
             setError("User does not exist/ Please check your credentials")
@@ -48,7 +48,7 @@ export default function Login(){
         
         <>
         
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center ml-10 shadow-2xl">
             <form className="flex flex-col gap-10 p-5 bg-white shadow-md rounded" method="post" onSubmit={handleSubmit} >
                 <h2 className="text-center text-blue-600 text-2xl font-black">Login</h2>
                 <input

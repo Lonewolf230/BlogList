@@ -1,14 +1,33 @@
-import { Link } from "react-router-dom"
+import { Link,useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
+import axios from 'axios'
 
 export default function SignUp(){
     const baseUrl='/api/users'
 
+    const navigate=useNavigate()
+
     const [userData,setUserData]=useState({username:"",name:"",password:"",repassword:""})
     const [passwordMatch,setPasswordMatch]=useState(false)
 
-    const handleSubmit=()=>{
+    const handleSubmit=async (e)=>{
+        e.preventDefault()
+        
+        if(!passwordMatch){
+            const user={
+                username:userData.username,
+                name:userData.name,
+                password:userData.password
+            }
+            try{    
+                const response=await axios.post(baseUrl,user)
+                console.log(response);
+                navigate('../')
+            }
+            catch(err){
 
+            }
+        }
     }
 
     useEffect(()=>{
@@ -76,7 +95,7 @@ export default function SignUp(){
                 Sign Up
                 </button>
 
-                <Link to="../login"><h3 className="text-blue-600 text-sm text-right cursor-pointer">Already an User? Login</h3></Link>
+                <Link to="../"><h3 className="text-blue-600 text-sm text-right cursor-pointer">Already an User? Login</h3></Link>
             </form>
             </div>
         </>

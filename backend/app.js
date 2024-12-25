@@ -11,6 +11,8 @@ const commentRouter=require('./controllers/comments')
  const config=require("./utils/config")
 const path=require('path')
 
+
+
 mongoose.set('strictQuery',false)
 
 mongoose.connect(config.uri).then(res=>{
@@ -18,15 +20,11 @@ mongoose.connect(config.uri).then(res=>{
 })
 .catch(err=>console.log("Connection Unsuccessful"))
 
-// app.use(express.static(path.join(__dirname, 'dist')))
+app.use(express.static(path.join(__dirname, 'dist')))
 
 // app.use(express.static('dist'))
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  }));
-  
+app.use(cors());
+
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
@@ -42,8 +40,11 @@ app.use("/api/users",usersRouter)
 
 app.use("/api/blogs",blogRouter)
 
-app.use('/api/comments',commentRouter)
+app.use('/api/comments',middleware.decodeandVerifyToken,commentRouter)
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 app.use(middleware.errorHandler)
 
